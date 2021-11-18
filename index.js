@@ -2,6 +2,8 @@
 
 const jimp = require("jimp");
 const Delaunay = require("d3-delaunay").Delaunay;
+const fs = require('fs');
+const glob = require("glob");
 
 const neighborLocations = [
     [-1, -1],
@@ -33,8 +35,19 @@ if (process.argv.length < 3) {
     return;
 }
 
+let fileLocations = [];
 let promises = [];
-for (let fileLocation of argsArray) {
+
+for (let path of argsArray) {
+    var files = glob.sync(path + '/**/*');
+    for (let file of files) {
+        if (fs.lstatSync(file).isFile()) {
+            fileLocations.push(file);
+        }
+    }
+}
+
+for (let fileLocation of fileLocations) {
     promises.push((async function() {
         let image = await jimp.read(fileLocation);
 
